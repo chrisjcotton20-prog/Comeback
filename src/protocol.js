@@ -12,68 +12,68 @@ export const TOTAL_DAYS = 84;          // 12-week protocol length
 // ============================================================
 export const EX = {
   // Phase I stretches
-  supineHam:        { name: 'Supine Hamstring Stretch',          sets: '2–3 × 30 sec / leg',     note: 'Loop strap around foot. Raise leg straight to mild stretch only.' },
-  supineLatHam:     { name: 'Supine Lateral Hamstring',          sets: '2–3 × 30 sec / leg',     note: 'Same setup, leg drifts outward to bias lateral hamstring.' },
-  modPiriformis:    { name: 'Modified Piriformis Stretch',       sets: '2–3 × 30 sec / side',    note: 'Supine. Cross ankle over opposite knee, pull thigh in.' },
-  seatedHam:        { name: 'Seated Hamstring Stretch',          sets: '2–3 × 30 sec / leg',     note: 'Edge of chair. Heel down, hinge from hips.' },
-  seatedPiri:       { name: 'Seated Piriformis Stretch',         sets: '2–3 × 30 sec / side',    note: 'Figure-4 sitting. Gentle lean forward.' },
+  supineHam:        { name: 'Supine Hamstring Stretch',          sets: '2–3 × 30 sec / leg',     cat: 'Mobility', note: 'Loop strap around foot. Raise leg straight to mild stretch only.' },
+  supineLatHam:     { name: 'Supine Lateral Hamstring',          sets: '2–3 × 30 sec / leg',     cat: 'Mobility', note: 'Same setup, leg drifts outward to bias lateral hamstring.' },
+  modPiriformis:    { name: 'Modified Piriformis Stretch',       sets: '2–3 × 30 sec / side',    cat: 'Mobility', note: 'Supine. Cross ankle over opposite knee, pull thigh in.' },
+  seatedHam:        { name: 'Seated Hamstring Stretch',          sets: '2–3 × 30 sec / leg',     cat: 'Mobility', note: 'Edge of chair. Heel down, hinge from hips.' },
+  seatedPiri:       { name: 'Seated Piriformis Stretch',         sets: '2–3 × 30 sec / side',    cat: 'Mobility', note: 'Figure-4 sitting. Gentle lean forward.' },
 
   // Phase II stretches
-  giraffe:          { name: 'Giraffe (Standing Hamstring)',      sets: '2–3 × 30 sec / leg',     note: 'Foot on low platform. Flat back, hinge from hips.' },
-  golfer:           { name: 'Golfer Stretch',                    sets: '2–3 × 30 sec / side',    note: 'Standing side bend. Opens lateral hip and trunk.' },
-  thomas:           { name: 'Thomas Stretch',                    sets: '2–3 × 30 sec / side',    note: 'Edge of table. Hug one knee, let other dangle.' },
-  gastroc:          { name: 'Gastroc Stretch',                   sets: '2–3 × 30 sec / leg',     note: 'Staggered stance. Back knee straight, heel down.' },
-  soleus:           { name: 'Standing Soleus Stretch',           sets: '2–3 × 30 sec / leg',     note: 'Same as gastroc, back knee bent. Stop if knee hurts.' },
+  giraffe:          { name: 'Giraffe (Standing Hamstring)',      sets: '2–3 × 30 sec / leg',     cat: 'Mobility', note: 'Foot on low platform. Flat back, hinge from hips.' },
+  golfer:           { name: 'Golfer Stretch',                    sets: '2–3 × 30 sec / side',    cat: 'Mobility', note: 'Standing side bend. Opens lateral hip and trunk.' },
+  thomas:           { name: 'Thomas Stretch',                    sets: '2–3 × 30 sec / side',    cat: 'Mobility', note: 'Edge of table. Hug one knee, let other dangle.' },
+  gastroc:          { name: 'Gastroc Stretch',                   sets: '2–3 × 30 sec / leg',     cat: 'Mobility', note: 'Staggered stance. Back knee straight, heel down.' },
+  soleus:           { name: 'Standing Soleus Stretch',           sets: '2–3 × 30 sec / leg',     cat: 'Mobility', note: 'Same as gastroc, back knee bent. Stop if knee hurts.' },
 
   // Phase II activation
-  clamshells:       { name: 'Clamshells',                        sets: '2–3 × 15 / side',        note: 'Open top knee without rolling hips back.' },
-  sideLyingAbd:     { name: 'Side-Lying Hip Abduction',          sets: '2–3 × 15 / side',        note: 'Top leg straight, toes slightly down.' },
-  sideHipSeries:    { name: 'Side Hip Series (1–3)',             sets: '2 × 10–15 each position',note: '3-position side-lying progression.' },
-  buttBurners:      { name: 'Butt Burners (1–3)',                sets: '2 × 10–15 / side',       note: 'Quadruped hip extension. Squeeze glute, no low-back arch.' },
-  slr:              { name: 'Straight Leg Raise',                sets: '3 × 15 / leg',           note: 'Lock knee straight first, then lift ~12 inches.' },
-  psoasMarch:       { name: 'Psoas March',                       sets: '2–3 × 10 / side',        note: 'Light band resistance. Hip flexor endurance.' },
+  clamshells:       { name: 'Clamshells',                        sets: '2–3 × 15 / side',        cat: 'Strength', note: 'Open top knee without rolling hips back.' },
+  sideLyingAbd:     { name: 'Side-Lying Hip Abduction',          sets: '2–3 × 15 / side',        cat: 'Strength', note: 'Top leg straight, toes slightly down.' },
+  sideHipSeries:    { name: 'Side Hip Series (1–3)',             sets: '2 × 10–15 each position',cat: 'Strength', note: '3-position side-lying progression.' },
+  buttBurners:      { name: 'Butt Burners (1–3)',                sets: '2 × 10–15 / side',       cat: 'Strength', note: 'Quadruped hip extension. Squeeze glute, no low-back arch.' },
+  slr:              { name: 'Straight Leg Raise',                sets: '3 × 15 / leg',           cat: 'Strength', note: 'Lock knee straight first, then lift ~12 inches.' },
+  psoasMarch:       { name: 'Psoas March',                       sets: '2–3 × 10 / side',        cat: 'Strength', note: 'Light band resistance. Hip flexor endurance.' },
 
   // Phase II core
-  taHeelTaps:       { name: 'TA with Heel Taps',                 sets: '2–3 × 10 / side',        note: 'Tabletop position. Low back pinned to floor.' },
-  deadBugRocks:     { name: 'Dead Bug Rocks',                    sets: '2–3 × 10 / side',        note: 'Slow opposite arm/leg extension.' },
-  plankRocks:       { name: 'Plank Rocks',                       sets: '2–3 × 10',               note: 'Forearm plank, rock over elbows.' },
-  plankKneeDrops:   { name: 'Plank with Knee Drops',             sets: '2–3 × 10 / side',        note: 'Tap knee to floor, hips stay level.' },
-  plankStepOut:     { name: 'Plank Step Out / In',               sets: '2–3 × 10 / side',        note: 'High plank, step foot out wide and back.' },
-  sitUpBall:        { name: 'Sit Ups with Ball Transfer',        sets: '2 × 10',                 note: 'Pass ball between hands and feet.' },
-  aroundWorld:      { name: 'Around the World',                  sets: '2 × 8–10 / direction',   note: 'Circle KB around body. Anti-rotation core.' },
+  taHeelTaps:       { name: 'TA with Heel Taps',                 sets: '2–3 × 10 / side',        cat: 'Strength', note: 'Tabletop position. Low back pinned to floor.' },
+  deadBugRocks:     { name: 'Dead Bug Rocks',                    sets: '2–3 × 10 / side',        cat: 'Strength', note: 'Slow opposite arm/leg extension.' },
+  plankRocks:       { name: 'Plank Rocks',                       sets: '2–3 × 10',               cat: 'Strength', note: 'Forearm plank, rock over elbows.' },
+  plankKneeDrops:   { name: 'Plank with Knee Drops',             sets: '2–3 × 10 / side',        cat: 'Strength', note: 'Tap knee to floor, hips stay level.' },
+  plankStepOut:     { name: 'Plank Step Out / In',               sets: '2–3 × 10 / side',        cat: 'Strength', note: 'High plank, step foot out wide and back.' },
+  sitUpBall:        { name: 'Sit Ups with Ball Transfer',        sets: '2 × 10',                 cat: 'Strength', note: 'Pass ball between hands and feet.' },
+  aroundWorld:      { name: 'Around the World',                  sets: '2 × 8–10 / direction',   cat: 'Strength', note: 'Circle KB around body. Anti-rotation core.' },
 
   // Phase II late strength
-  wallSit:          { name: 'Wall Sit (isometric)',              sets: '2–3 × 20–30 sec',        note: 'Shallow only (30–45°). Progress depth as pain allows.' },
-  shortArcQuad:     { name: 'Short Arc Quads',                   sets: '3 × 15 / leg',           note: 'Bolster under knee. Squeeze quad 2 sec at top.' },
-  tkeBand:          { name: 'TKE with Resistance Band',          sets: '3 × 15 / leg',           note: 'Band behind knee. Push knee back into full extension.' },
-  hamCurlBand:      { name: 'Seated Hamstring Curl (band)',      sets: '3 × 15 / leg',           note: 'Pull heel back against band.' },
-  bridgeLegLift:    { name: 'Bridges with Leg Lift',             sets: '2–3 × 10–12 / side',     note: 'Bridge, lift one leg. Hips stay level.' },
-  bridgeHamCurl:    { name: 'Bridge with Hamstring Curl',        sets: '2–3 × 10–12',            note: 'Heels on ball. Lift hips, roll ball in.' },
-  stepUp:           { name: 'Step Up',                           sets: '2–3 × 10 / leg',         note: '4–6 in box. Drive through heel. Slow down.' },
-  singleLegReach:   { name: 'Single Leg Reach',                  sets: '2–3 × 8–10 / leg',       note: 'Reach in different directions. Knee tracks over toes.' },
+  wallSit:          { name: 'Wall Sit (isometric)',              sets: '2–3 × 20–30 sec',        cat: 'Strength', note: 'Shallow only (30–45°). Progress depth as pain allows.' },
+  shortArcQuad:     { name: 'Short Arc Quads',                   sets: '3 × 15 / leg',           cat: 'Strength', note: 'Bolster under knee. Squeeze quad 2 sec at top.' },
+  tkeBand:          { name: 'TKE with Resistance Band',          sets: '3 × 15 / leg',           cat: 'Strength', note: 'Band behind knee. Push knee back into full extension.' },
+  hamCurlBand:      { name: 'Seated Hamstring Curl (band)',      sets: '3 × 15 / leg',           cat: 'Strength', note: 'Pull heel back against band.' },
+  bridgeLegLift:    { name: 'Bridges with Leg Lift',             sets: '2–3 × 10–12 / side',     cat: 'Strength', note: 'Bridge, lift one leg. Hips stay level.' },
+  bridgeHamCurl:    { name: 'Bridge with Hamstring Curl',        sets: '2–3 × 10–12',            cat: 'Strength', note: 'Heels on ball. Lift hips, roll ball in.' },
+  stepUp:           { name: 'Step Up',                           sets: '2–3 × 10 / leg',         cat: 'Strength', note: '4–6 in box. Drive through heel. Slow down.' },
+  singleLegReach:   { name: 'Single Leg Reach',                  sets: '2–3 × 8–10 / leg',       cat: 'Strength', note: 'Reach in different directions. Knee tracks over toes.' },
 
   // Bulletproof Phase II
-  tibRaises:        { name: 'Tibialis Raises',                   sets: '3 × 15–20',              note: 'Heels at wall. Lift toes to shins, slow lower.' },
-  calfRaiseSingle:  { name: 'Single-Leg Calf Raise',             sets: '3 × 10–15 / leg',        note: 'One leg on edge of step. Full ROM.' },
-  kneeCARs:         { name: 'Knee CARs (controlled circles)',    sets: '5–10 each direction',    note: 'Slow knee circles. Joint mobility.' },
-  foamRollLatQuad:  { name: 'Foam Roll Lateral Quad / TFL',      sets: '2–3 min / leg',          note: 'Hip to just above knee. Side-lying.' },
+  tibRaises:        { name: 'Tibialis Raises',                   sets: '3 × 15–20',              cat: 'Strength', note: 'Heels at wall. Lift toes to shins, slow lower.' },
+  calfRaiseSingle:  { name: 'Single-Leg Calf Raise',             sets: '3 × 10–15 / leg',        cat: 'Strength', note: 'One leg on edge of step. Full ROM.' },
+  kneeCARs:         { name: 'Knee CARs (controlled circles)',    sets: '5–10 each direction',    cat: 'Mobility', note: 'Slow knee circles. Joint mobility.' },
+  foamRollLatQuad:  { name: 'Foam Roll Lateral Quad / TFL',      sets: '2–3 min / leg',          cat: 'Mobility', note: 'Hip to just above knee. Side-lying.' },
 
   // Phase III
-  latStepDown:      { name: 'Lateral Step Downs',                sets: '2 × 15 / leg',           note: '3–5 sec lowering. Knee tracks straight.' },
-  bosuLunge:        { name: 'BOSU Lunge',                        sets: '2–3 × 10 / leg',         note: 'Front foot on BOSU. Reverse lunge.' },
-  spanishSquat:     { name: 'Spanish Squat',                     sets: '2–3 × 10–15',            note: 'Heavy band behind knees. Sit back with vertical shins.' },
-  petersonStep:     { name: 'Peterson Step-Up',                  sets: '2 × 10–15 / leg',        note: '4–6 in step. Heel up. Slow bend, tap off-heel forward.' },
-  slantSquat:       { name: 'Slant Board Squat',                 sets: '2–3 × 10–15',            note: 'Heels elevated 25–30°. Bodyweight squat.' },
-  bulgarianSplit:   { name: 'Bulgarian Split Squat',             sets: '2–3 × 8–10 / leg',       note: 'Rear foot on bench. Upright torso.' },
-  singleLegHinge:   { name: 'Single-Leg Hinge',                  sets: '2–3 × 8 / leg',          note: 'Hinge forward, extend back leg.' },
+  latStepDown:      { name: 'Lateral Step Downs',                sets: '2 × 15 / leg',           cat: 'Strength', note: '3–5 sec lowering. Knee tracks straight.' },
+  bosuLunge:        { name: 'BOSU Lunge',                        sets: '2–3 × 10 / leg',         cat: 'Strength', note: 'Front foot on BOSU. Reverse lunge.' },
+  spanishSquat:     { name: 'Spanish Squat',                     sets: '2–3 × 10–15',            cat: 'Strength', note: 'Heavy band behind knees. Sit back with vertical shins.' },
+  petersonStep:     { name: 'Peterson Step-Up',                  sets: '2 × 10–15 / leg',        cat: 'Strength', note: '4–6 in step. Heel up. Slow bend, tap off-heel forward.' },
+  slantSquat:       { name: 'Slant Board Squat',                 sets: '2–3 × 10–15',            cat: 'Strength', note: 'Heels elevated 25–30°. Bodyweight squat.' },
+  bulgarianSplit:   { name: 'Bulgarian Split Squat',             sets: '2–3 × 8–10 / leg',       cat: 'Strength', note: 'Rear foot on bench. Upright torso.' },
+  singleLegHinge:   { name: 'Single-Leg Hinge',                  sets: '2–3 × 8 / leg',          cat: 'Strength', note: 'Hinge forward, extend back leg.' },
 
   // Running (workout details replaced at runtime)
-  runDay:           { name: 'Easy Run',                          sets: '—',                      note: 'See running progression for this week.', dynamic: 'run' },
+  runDay:           { name: 'Easy Run',                          sets: '—',                      cat: 'Cardio',   note: 'See running progression for this week.', dynamic: 'run' },
 
   // Cardio
-  easyBike:         { name: 'Easy Cardio (bike/pool)',           sets: '15–30 min easy',         note: 'No knee loading. Conversational effort.' },
-  longCardio:       { name: 'Longer Cardio Session',             sets: '30–45 min easy',         note: 'Bike or pool jog. Build aerobic base.' },
-  crossTrain:       { name: 'Cross-Training Cardio',             sets: '30 min',                 note: 'Bike, elliptical, or pool. Non-impact.' },
+  easyBike:         { name: 'Easy Cardio (bike/pool)',           sets: '15–30 min easy',         cat: 'Cardio',   note: 'No knee loading. Conversational effort.' },
+  longCardio:       { name: 'Longer Cardio Session',             sets: '30–45 min easy',         cat: 'Cardio',   note: 'Bike or pool jog. Build aerobic base.' },
+  crossTrain:       { name: 'Cross-Training Cardio',             sets: '30 min',                 cat: 'Cardio',   note: 'Bike, elliptical, or pool. Non-impact.' },
 };
 
 // ============================================================

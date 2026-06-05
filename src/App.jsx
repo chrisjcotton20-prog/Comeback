@@ -10,6 +10,11 @@ import {
 } from './protocol.js';
 
 // ============================================================
+// CATEGORIES
+// ============================================================
+const CATEGORY_ORDER = ['Mobility', 'Strength', 'Cardio'];
+
+// ============================================================
 // STORAGE — localStorage with async wrapper for portability
 // ============================================================
 const STORAGE_KEY = 'comeback_completions_v1';
@@ -189,15 +194,30 @@ function TodayView({ todayISO, completions, onToggle, onShowInfo }) {
       )}
 
       <div style={{ marginTop: 24 }}>
-        {exercises.map((ex) => (
-          <ExerciseCard
-            key={ex.id}
-            ex={ex}
-            done={todayCompleted.includes(ex.id)}
-            onToggle={() => onToggle(todayISO, ex.id)}
-            onInfo={() => onShowInfo(ex)}
-          />
-        ))}
+        {CATEGORY_ORDER
+          .map((cat) => ({ cat, items: exercises.filter((e) => e.cat === cat) }))
+          .filter((g) => g.items.length > 0)
+          .map(({ cat, items }, idx) => (
+            <div key={cat}>
+              <div
+                style={{
+                  ...styles.categoryHeader,
+                  ...(idx > 0 ? { marginTop: 24 } : {}),
+                }}
+              >
+                {cat}
+              </div>
+              {items.map((ex) => (
+                <ExerciseCard
+                  key={ex.id}
+                  ex={ex}
+                  done={todayCompleted.includes(ex.id)}
+                  onToggle={() => onToggle(todayISO, ex.id)}
+                  onInfo={() => onShowInfo(ex)}
+                />
+              ))}
+            </div>
+          ))}
       </div>
 
       {allDone && exercises.length > 0 && (
@@ -613,6 +633,18 @@ const styles = {
     border: '1px solid var(--rule)',
     marginBottom: 8,
     transition: 'all 200ms ease',
+  },
+  categoryHeader: {
+    fontFamily: 'Montserrat, sans-serif',
+    fontSize: 11,
+    fontWeight: 700,
+    letterSpacing: '0.14em',
+    color: 'var(--muted)',
+    textTransform: 'uppercase',
+    marginTop: 4,
+    marginBottom: 12,
+    paddingBottom: 8,
+    borderBottom: '1px solid var(--rule)',
   },
   exCardDone: {
     background: 'var(--bg-card)',
