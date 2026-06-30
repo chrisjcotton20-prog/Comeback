@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import {
   Check, Calendar, Home, ChevronLeft, ChevronRight,
-  Flame, Trophy, Clock, Zap, Layers
+  Flame, Trophy, Clock, Zap, Layers, Info
 } from 'lucide-react';
 import {
   PRP_DATE,
@@ -16,6 +16,7 @@ import {
   fullModeItems,
   floorModeItems,
 } from './protocol.js';
+import { lookupExercise } from './exerciseLibrary.js';
 
 // ============================================================
 // CATEGORY ORDER & CONFIG
@@ -403,38 +404,93 @@ function FloorSession({ items, todayISO, doneIds, onToggle }) {
 // ITEM ROW
 // ============================================================
 function ItemRow({ name, detail, done, onToggle }) {
+  const [expanded, setExpanded] = useState(false);
+  const lib = useMemo(() => lookupExercise(name), [name]);
+  const hasLib = !!lib;
+
   return (
-    <div style={{ ...styles.itemRow, ...(done ? styles.itemRowDone : {}) }}>
-      <button
-        onClick={onToggle}
-        style={{ ...styles.checkbox, ...(done ? styles.checkboxDone : {}) }}
-        aria-label={done ? 'Mark incomplete' : 'Mark complete'}
-      >
-        {done && <Check size={14} strokeWidth={3} color="white" />}
-      </button>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{
-          fontWeight: 600,
-          fontSize: 15,
-          color: done ? 'var(--muted)' : 'var(--ink)',
-          textDecoration: done ? 'line-through' : 'none',
-          letterSpacing: '-0.01em',
-          lineHeight: 1.3,
-        }}>
-          {name}
-        </div>
-        {detail && (
+    <div style={{ ...styles.itemWrap, ...(done ? styles.itemWrapDone : {}) }}>
+      <div style={styles.itemMain}>
+        <button
+          onClick={onToggle}
+          style={{ ...styles.checkbox, ...(done ? styles.checkboxDone : {}) }}
+          aria-label={done ? 'Mark incomplete' : 'Mark complete'}
+        >
+          {done && <Check size={14} strokeWidth={3} color="white" />}
+        </button>
+        <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{
-            fontSize: 13,
-            color: 'var(--muted)',
-            marginTop: 3,
-            fontVariantNumeric: 'tabular-nums',
-            lineHeight: 1.35,
+            fontWeight: 600,
+            fontSize: 15,
+            color: done ? 'var(--muted)' : 'var(--ink)',
+            textDecoration: done ? 'line-through' : 'none',
+            letterSpacing: '-0.01em',
+            lineHeight: 1.3,
           }}>
-            {detail}
+            {name}
           </div>
+          {detail && (
+            <div style={{
+              fontSize: 13,
+              color: 'var(--muted)',
+              marginTop: 3,
+              fontVariantNumeric: 'tabular-nums',
+              lineHeight: 1.35,
+            }}>
+              {detail}
+            </div>
+          )}
+        </div>
+        {hasLib && (
+          <button
+            onClick={() => setExpanded(e => !e)}
+            style={{ ...styles.infoBtn, ...(expanded ? styles.infoBtnActive : {}) }}
+            aria-label={expanded ? 'Hide details' : 'Show details'}
+            aria-expanded={expanded}
+          >
+            <Info size={15} strokeWidth={1.8} />
+          </button>
         )}
       </div>
+      {expanded && hasLib && <ExerciseDetail lib={lib} />}
+    </div>
+  );
+}
+
+// ============================================================
+// EXERCISE DETAIL — the expandable panel
+// ============================================================
+function ExerciseDetail({ lib }) {
+  return (
+    <div style={styles.detailPanel}>
+      {lib.setup && (
+        <DetailField label="Setup" text={lib.setup} />
+      )}
+      {lib.execution && (
+        <DetailField label="Execution" text={lib.execution} />
+      )}
+      {lib.cues && (
+        <DetailField label="Cues" text={lib.cues} accent />
+      )}
+      {lib.faults && (
+        <DetailField label="Watch For" text={lib.faults} variant="warn" />
+      )}
+      {lib.source && (
+        <div style={styles.detailSource}>Source: {lib.source}</div>
+      )}
+    </div>
+  );
+}
+
+function DetailField({ label, text, accent, variant }) {
+  const labelColor =
+    variant === 'warn' ? 'var(--warn)' :
+    accent ? 'var(--accent)' :
+    'var(--muted)';
+  return (
+    <div style={styles.detailField}>
+      <div style={{ ...styles.detailLabel, color: labelColor }}>{label}</div>
+      <div style={styles.detailText}>{text}</div>
     </div>
   );
 }
@@ -782,10 +838,20 @@ const styles = {
   blockOptionalTag: { display: 'inline-block', fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', padding: '2px 7px', background: 'var(--bg-card)', color: 'var(--muted)', borderRadius: 4, border: '1px solid var(--rule)' },
   blockEmphasis: { fontSize: 12, color: 'var(--muted)', marginTop: 4, fontStyle: 'italic' },
 
-  itemRow: { display: 'flex', alignItems: 'flex-start', gap: 12, padding: '12px 14px', background: 'var(--bg-card-hi)', borderRadius: 8, border: '1px solid var(--rule)', marginBottom: 6, transition: 'all 200ms ease' },
-  itemRowDone: { background: 'var(--bg-card)', borderColor: 'var(--accent-soft)' },
+  itemWrap: { background: 'var(--bg-card-hi)', borderRadius: 8, border: '1px solid var(--rule)', marginBottom: 6, transition: 'all 200ms ease', overflow: 'hidden' },
+  itemWrapDone: { background: 'var(--bg-card)', borderColor: 'var(--accent-soft)' },
+  itemMain: { display: 'flex', alignItems: 'flex-start', gap: 12, padding: '12px 14px' },
   checkbox: { width: 24, height: 24, borderRadius: 6, border: '1.5px solid var(--rule)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: 'transparent', marginTop: 2, transition: 'all 150ms ease' },
   checkboxDone: { background: 'var(--accent)', borderColor: 'var(--accent)' },
+  infoBtn: { width: 28, height: 28, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: 'var(--muted)', marginTop: 1, transition: 'all 150ms ease' },
+  infoBtnActive: { background: 'var(--ink)', color: 'white' },
+
+  // Expandable detail panel
+  detailPanel: { padding: '14px 16px 16px 50px', background: 'var(--bg-card)', borderTop: '1px solid var(--rule)' },
+  detailField: { marginBottom: 10 },
+  detailLabel: { fontFamily: 'Montserrat, sans-serif', fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 4 },
+  detailText: { fontSize: 13.5, lineHeight: 1.45, color: 'var(--ink)' },
+  detailSource: { fontSize: 11, color: 'var(--muted)', marginTop: 8, fontStyle: 'italic' },
 
   retroBox: { padding: 18, background: 'var(--bg-card-hi)', border: '1px solid var(--rule)', borderRadius: 10 },
   retroField: { marginBottom: 16 },
