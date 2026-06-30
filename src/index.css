@@ -40,6 +40,16 @@ button:focus-visible {
   outline-offset: 2px;
 }
 
+textarea {
+  font-family: inherit;
+  resize: vertical;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
 /* Standalone PWA — respect iOS safe areas */
 @supports (padding: max(0px)) {
   body {
