@@ -26,6 +26,25 @@ export const PHASE_LABELS = {
 export const DOSE_DOTS = { light: 1, brief: 1, moderate: 2, heavy: 3 };
 
 // ============================================================
+// RUNNING PROGRESSION — Phase III walk-jog → continuous
+// Run days: Tue/Thu/Sat (3×/week) in Phase III; 3–4×/week in Maintenance
+// ============================================================
+export const RUN_PROGRESSION = [
+  { startDay: 43, endDay: 56, workout: '1 min jog / 2 min walk × 8',  durMin: 24, surface: 'Treadmill',                  label: 'Phase III · Wk 1–2' },
+  { startDay: 57, endDay: 63, workout: '2 min jog / 1 min walk × 8',  durMin: 24, surface: 'Treadmill',                  label: 'Phase III · Wk 3' },
+  { startDay: 64, endDay: 70, workout: '3 min jog / 1 min walk × 6',  durMin: 24, surface: 'Treadmill or flat outdoor',  label: 'Phase III · Wk 4' },
+  { startDay: 71, endDay: 77, workout: '5 min jog / 1 min walk × 4',  durMin: 24, surface: 'Outdoor flat',                label: 'Phase III · Wk 5' },
+  { startDay: 78, endDay: 84, workout: 'Continuous easy 15–20 min',   durMin: 18, surface: 'Outdoor flat',                label: 'Phase III · Wk 6' },
+  { startDay: 85, endDay: 9999, workout: 'Continuous easy 20–30 min + strides 4 × 20 sec', durMin: 28, surface: 'Vary', label: 'Maintenance' },
+];
+
+// Pain rules apply to every run
+export const RUN_PAIN_RULES = [
+  'Stop the run if knee pain rises above 3/10. Try again next session.',
+  'If knee is more sore or swollen the morning after, repeat the previous week.',
+];
+
+// ============================================================
 // V2 PROGRAM — weekly schedule (0=Sun, 1=Mon...6=Sat)
 //
 // Each day has:
@@ -130,6 +149,7 @@ export const DAYS = {
         { name: 'Wall-banded dorsiflexion', detail: '10/side' },
         { name: 'Calf stretch split stance', detail: '60 sec gastroc + 60 sec soleus/side' },
       ]},
+      { name: 'Run', duration: 25, isRun: true, runProgressionFor: ['p3', 'maint'], emphasis: 'Scheduled run day' },
       { name: 'Load', duration: 20, emphasis: 'Single-leg strength', phaseGated: true, byPhase: {
         p2early: [
           { name: 'Wall-supported single-leg balance', detail: '3×30 sec/side' },
@@ -275,6 +295,7 @@ export const DAYS = {
         { name: 'Hanging (or banded assist)', detail: '2×30 sec · when equipped' },
         { name: 'Wall-supported handstand hold', detail: '10–30 sec × 2 · optional' },
       ]},
+      { name: 'Run', duration: 25, isRun: true, runProgressionFor: ['p3', 'maint'], emphasis: 'Scheduled run day' },
       { name: 'Load', duration: 20, emphasis: 'Push/pull balance', phaseGated: true, byPhase: {
         p2early: [
           { name: 'Banded row', detail: '3×12' },
@@ -419,11 +440,9 @@ export const DAYS = {
     fullMin: 60, floorMin: 30,
     isFlow: true,
     blocks: [
-      { name: 'Aerobic', duration: 40, emphasis: 'Phase-gated', phaseGated: true, byPhase: {
+      { name: 'Cardio', duration: 40, emphasis: 'Phase-gated', phaseGated: true, isRun: true, runProgressionFor: ['p3', 'maint'], byPhase: {
         p2early: [{ name: 'Bike / elliptical / pool walk', detail: '30–45 min easy conversational' }],
         p2late:  [{ name: 'Bike or pool jog', detail: '30–45 min steady' }],
-        p3:      [{ name: 'Walk-jog intervals', detail: 'See running progression' }],
-        maint:   [{ name: 'Long easy run', detail: 'Build duration weekly' }],
       }},
       { name: 'Settling', duration: 4, waveBodyPos: 'Supine', isFlowWave: true, items: [
         { name: '90/90 breathing', detail: '5 breaths/side · (B)' },
@@ -590,18 +609,33 @@ export function workoutForDate(iso) {
   return { dayN, phase, dow, day };
 }
 
-export function resolveBlockItems(block, phaseId) {
+export function runForDate(iso) {
+  const dayN = dayNumberForDate(iso);
+  if (dayN < 0) return null;
+  return RUN_PROGRESSION.find(r => dayN >= r.startDay && dayN <= r.endDay) || null;
+}
+
+export function resolveBlockItems(block, phaseId, iso) {
+  // Run-progression block: dynamic items pulled from RUN_PROGRESSION by date
+  if (block.runProgressionFor && block.runProgressionFor.includes(phaseId)) {
+    const run = iso ? runForDate(iso) : null;
+    if (!run) return [];
+    return [{
+      name: run.workout,
+      detail: `${run.surface} · ~${run.durMin} min · ${run.label}`,
+    }];
+  }
   if (block.phaseGated && block.byPhase) {
     return block.byPhase[phaseId] || [];
   }
   return block.items || [];
 }
 
-export function fullModeItems(day, phaseId) {
+export function fullModeItems(day, phaseId, iso) {
   const items = [];
   day.blocks.forEach((block, bi) => {
     if (block.isRetrospective) return; // retrospective doesn't count toward checkboxes
-    const blockItems = resolveBlockItems(block, phaseId);
+    const blockItems = resolveBlockItems(block, phaseId, iso);
     blockItems.forEach((it, ii) => {
       items.push({ id: `b${bi}_${ii}`, ...it, blockIndex: bi });
     });

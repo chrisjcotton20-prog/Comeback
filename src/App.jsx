@@ -149,7 +149,7 @@ function TodayView({ todayISO, completions, retros, onToggle, onRetroChange }) {
   if (!wo) return <PreStart />;
   const { dayN, phase, day } = wo;
 
-  const items = mode === 'full' ? fullModeItems(day, phase.id) : floorModeItems(day);
+  const items = mode === 'full' ? fullModeItems(day, phase.id, todayISO) : floorModeItems(day);
   const doneIds = completions[todayISO] || [];
   const doneCount = items.filter(i => doneIds.includes(i.id)).length;
   const total = items.length;
@@ -333,19 +333,21 @@ function FullSession({ day, phaseId, todayISO, doneIds, onToggle, retros, onRetr
 // BLOCK SECTION
 // ============================================================
 function BlockSection({ block, blockIndex, phaseId, todayISO, doneIds, onToggle, isFlowWave }) {
-  const items = resolveBlockItems(block, phaseId);
+  const items = resolveBlockItems(block, phaseId, todayISO);
   if (items.length === 0) return null;
+  const isRunBlock = !!block.isRun && block.runProgressionFor && block.runProgressionFor.includes(phaseId);
 
   return (
     <div style={{ marginBottom: 28 }}>
-      <div style={styles.blockHeader}>
+      <div style={{ ...styles.blockHeader, ...(isRunBlock ? styles.blockHeaderRun : {}) }}>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap' }}>
-          <span style={styles.blockName}>{block.name}</span>
+          <span style={{ ...styles.blockName, ...(isRunBlock ? styles.blockNameRun : {}) }}>{block.name}</span>
           <span style={styles.blockMeta}>
             <Clock size={11} strokeWidth={2} style={{ marginRight: 3, verticalAlign: '-1px' }} />
             {block.duration} min
           </span>
-          {block.phaseGated && <span style={styles.blockPhaseTag}>{PHASE_LABELS[phaseId]}</span>}
+          {block.phaseGated && !isRunBlock && <span style={styles.blockPhaseTag}>{PHASE_LABELS[phaseId]}</span>}
+          {isRunBlock && <span style={styles.blockRunTag}>Run Day</span>}
           {block.optional && <span style={styles.blockOptionalTag}>Optional</span>}
         </div>
         {block.emphasis && <div style={styles.blockEmphasis}>{block.emphasis}</div>}
@@ -364,6 +366,15 @@ function BlockSection({ block, blockIndex, phaseId, todayISO, doneIds, onToggle,
           />
         );
       })}
+      {isRunBlock && <RunRules />}
+    </div>
+  );
+}
+
+function RunRules() {
+  return (
+    <div style={styles.runRules}>
+      <span style={styles.runRulesLabel}>Pain rule:</span> stop if knee &gt; 3/10 · more sore next morning = repeat this week, don&apos;t progress
     </div>
   );
 }
@@ -601,7 +612,7 @@ function CalendarView({ todayISO, completions, onSelectDate }) {
       const wo = workoutForDate(iso);
       if (!wo) break;
 
-      const items = fullModeItems(wo.day, wo.phase.id);
+      const items = fullModeItems(wo.day, wo.phase.id, iso);
       if (items.length === 0) {
         cursor.setDate(cursor.getDate() - 1);
         continue;
@@ -692,7 +703,7 @@ function CalendarView({ todayISO, completions, onSelectDate }) {
           const wo = beforeProtocol ? null : workoutForDate(iso);
           let allDone = false, someDone = false;
           if (wo) {
-            const items = fullModeItems(wo.day, wo.phase.id);
+            const items = fullModeItems(wo.day, wo.phase.id, iso);
             const floor = floorModeItems(wo.day);
             const doneIds = completions[iso] || [];
             if (items.length > 0) {
@@ -832,11 +843,17 @@ const styles = {
   progressLabel: { marginTop: 8, fontSize: 12, color: 'var(--muted)', fontVariantNumeric: 'tabular-nums', fontWeight: 600 },
 
   blockHeader: { marginBottom: 12, paddingBottom: 10, borderBottom: '1px solid var(--rule)' },
+  blockHeaderRun: { paddingBottom: 12, borderBottom: '2px solid var(--warn)' },
   blockName: { fontFamily: 'Montserrat, sans-serif', fontSize: 14, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', color: 'var(--ink)' },
+  blockNameRun: { fontSize: 16, color: 'var(--warn)', letterSpacing: '0.06em' },
   blockMeta: { fontSize: 11, fontWeight: 600, color: 'var(--muted)', letterSpacing: '0.04em', textTransform: 'uppercase', display: 'inline-flex', alignItems: 'center', fontVariantNumeric: 'tabular-nums' },
   blockPhaseTag: { display: 'inline-block', fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', padding: '2px 7px', background: 'var(--accent-soft)', color: 'var(--accent)', borderRadius: 4 },
+  blockRunTag: { display: 'inline-block', fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', padding: '2px 7px', background: 'var(--warn)', color: 'white', borderRadius: 4 },
   blockOptionalTag: { display: 'inline-block', fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', padding: '2px 7px', background: 'var(--bg-card)', color: 'var(--muted)', borderRadius: 4, border: '1px solid var(--rule)' },
   blockEmphasis: { fontSize: 12, color: 'var(--muted)', marginTop: 4, fontStyle: 'italic' },
+
+  runRules: { marginTop: 8, padding: '8px 12px', background: 'var(--bg-card)', border: '1px solid var(--rule)', borderRadius: 6, fontSize: 12, color: 'var(--muted)', lineHeight: 1.4 },
+  runRulesLabel: { fontWeight: 700, color: 'var(--warn)', textTransform: 'uppercase', letterSpacing: '0.06em', fontSize: 11, marginRight: 4 },
 
   itemWrap: { background: 'var(--bg-card-hi)', borderRadius: 8, border: '1px solid var(--rule)', marginBottom: 6, transition: 'all 200ms ease', overflow: 'hidden' },
   itemWrapDone: { background: 'var(--bg-card)', borderColor: 'var(--accent-soft)' },
