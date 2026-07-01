@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import {
   Check, Calendar, Home, ChevronLeft, ChevronRight,
-  Flame, Trophy, Clock, Zap, Layers, Info
+  Flame, Trophy, Clock, Zap, Layers, Info, TrendingUp
 } from 'lucide-react';
 import {
   PRP_DATE,
   TOTAL_DAYS,
+  PHASES,
   PHASE_LABELS,
   DOSE_DOTS,
+  BENCHMARK_MARKERS,
   parseISODate,
   toISODate,
   dayNumberForDate,
@@ -16,14 +18,16 @@ import {
   fullModeItems,
   floorModeItems,
   isRunDayForPhase,
+  isFirstSundayOfMonth,
 } from './protocol.js';
 import { lookupExercise } from './exerciseLibrary.js';
 
 // ============================================================
 // CATEGORY ORDER & CONFIG
 // ============================================================
-const STORAGE_KEY = 'comeback_v2_completions';
-const RETRO_KEY   = 'comeback_v2_retrospectives';
+const STORAGE_KEY    = 'comeback_v2_completions';
+const RETRO_KEY      = 'comeback_v2_retrospectives';
+const BENCHMARKS_KEY = 'comeback_v2_benchmarks';
 
 // ============================================================
 // STORAGE — localStorage with async wrapper for portability
@@ -45,6 +49,7 @@ export default function App() {
   const [todayISO, setTodayISO] = useState(toISODate(new Date()));
   const [completions, setCompletions] = useState({});
   const [retros, setRetros] = useState({});
+  const [benchmarks, setBenchmarks] = useState({});
   const [loaded, setLoaded] = useState(false);
 
   // Load from storage on mount
@@ -54,6 +59,8 @@ export default function App() {
       if (c) { try { setCompletions(JSON.parse(c)); } catch {} }
       const r = await storage.get(RETRO_KEY);
       if (r) { try { setRetros(JSON.parse(r)); } catch {} }
+      const b = await storage.get(BENCHMARKS_KEY);
+      if (b) { try { setBenchmarks(JSON.parse(b)); } catch {} }
       setLoaded(true);
     })();
   }, []);
@@ -68,6 +75,11 @@ export default function App() {
     if (!loaded) return;
     storage.set(RETRO_KEY, JSON.stringify(retros));
   }, [retros, loaded]);
+
+  useEffect(() => {
+    if (!loaded) return;
+    storage.set(BENCHMARKS_KEY, JSON.stringify(benchmarks));
+  }, [benchmarks, loaded]);
 
   // Refresh today's date when the app comes back to foreground
   useEffect(() => {
@@ -92,6 +104,10 @@ export default function App() {
     setRetros(prev => ({ ...prev, [date]: { ...(prev[date] || {}), [field]: value } }));
   };
 
+  const updateBenchmark = (date, field, value) => {
+    setBenchmarks(prev => ({ ...prev, [date]: { ...(prev[date] || {}), [field]: value } }));
+  };
+
   return (
     <div style={styles.app}>
       <div style={styles.container}>
@@ -101,14 +117,18 @@ export default function App() {
             todayISO={todayISO}
             completions={completions}
             retros={retros}
+            benchmarks={benchmarks}
             onToggle={toggleExercise}
             onRetroChange={updateRetro}
+            onBenchmarkChange={updateBenchmark}
           />
         )}
         {view === 'calendar' && (
           <CalendarView
             todayISO={todayISO}
             completions={completions}
+            retros={retros}
+            benchmarks={benchmarks}
             onSelectDate={(iso) => { setTodayISO(iso); setView('today'); }}
           />
         )}
@@ -143,7 +163,7 @@ function BrandHeader() {
 // ============================================================
 // TODAY VIEW
 // ============================================================
-function TodayView({ todayISO, completions, retros, onToggle, onRetroChange }) {
+function TodayView({ todayISO, completions, retros, benchmarks, onToggle, onRetroChange, onBenchmarkChange }) {
   const [mode, setMode] = useState('full');
   const wo = useMemo(() => workoutForDate(todayISO), [todayISO]);
 
@@ -208,6 +228,8 @@ function TodayView({ todayISO, completions, retros, onToggle, onRetroChange }) {
           onToggle={onToggle}
           retros={retros}
           onRetroChange={onRetroChange}
+          benchmarks={benchmarks}
+          onBenchmarkChange={onBenchmarkChange}
         />
       ) : (
         <FloorSession items={items} todayISO={todayISO} doneIds={doneIds} onToggle={onToggle} />
@@ -298,7 +320,7 @@ function ModeToggle({ mode, setMode, fullMin, floorMin }) {
 // ============================================================
 // FULL SESSION
 // ============================================================
-function FullSession({ day, phaseId, todayISO, doneIds, onToggle, retros, onRetroChange }) {
+function FullSession({ day, phaseId, todayISO, doneIds, onToggle, retros, onRetroChange, benchmarks, onBenchmarkChange }) {
   const isRunDay = isRunDayForPhase(day, phaseId);
   return (
     <div style={{ marginTop: 24 }}>
@@ -311,6 +333,17 @@ function FullSession({ day, phaseId, todayISO, doneIds, onToggle, retros, onRetr
               todayISO={todayISO}
               retros={retros}
               onRetroChange={onRetroChange}
+            />
+          );
+        }
+        if (block.isBenchmarks) {
+          return (
+            <BenchmarksBlock
+              key={bi}
+              block={block}
+              todayISO={todayISO}
+              benchmarks={benchmarks}
+              onBenchmarkChange={onBenchmarkChange}
             />
           );
         }
@@ -519,6 +552,101 @@ function DetailField({ label, text, accent, variant }) {
 }
 
 // ============================================================
+// BENCHMARKS
+// ============================================================
+function findLastReading(benchmarks, markerId, beforeIso) {
+  // Find the most recent reading strictly before beforeIso
+  let bestDate = null, bestVal = null;
+  for (const [date, dayData] of Object.entries(benchmarks || {})) {
+    if (date >= beforeIso) continue;
+    const v = dayData?.[markerId];
+    if (v === undefined || v === '' || v === null) continue;
+    const num = parseFloat(v);
+    if (isNaN(num)) continue;
+    if (!bestDate || date > bestDate) { bestDate = date; bestVal = num; }
+  }
+  return bestDate ? { date: bestDate, value: bestVal } : null;
+}
+
+function BenchmarksBlock({ block, todayISO, benchmarks, onBenchmarkChange }) {
+  const isMonthly = isFirstSundayOfMonth(todayISO);
+  const todayData = benchmarks[todayISO] || {};
+  return (
+    <div style={{ marginBottom: 28 }}>
+      <div style={styles.blockHeader}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
+          <span style={styles.blockName}>{block.name}</span>
+          <span style={styles.blockMeta}>
+            <TrendingUp size={11} strokeWidth={2} style={{ marginRight: 3, verticalAlign: '-1px' }} />
+            {isMonthly ? 'Weekly + Monthly' : 'Weekly'}
+          </span>
+        </div>
+        <div style={styles.blockEmphasis}>{block.emphasis}</div>
+      </div>
+      <div style={styles.retroBox}>
+        <div style={styles.markerSectionLabel}>Weekly · takes 30 sec</div>
+        {BENCHMARK_MARKERS.weekly.map(marker => (
+          <BenchmarkField
+            key={marker.id}
+            marker={marker}
+            value={todayData[marker.id] || ''}
+            lastReading={findLastReading(benchmarks, marker.id, todayISO)}
+            onChange={(v) => onBenchmarkChange(todayISO, marker.id, v)}
+          />
+        ))}
+        {isMonthly && (
+          <>
+            <div style={{ ...styles.markerSectionLabel, marginTop: 20 }}>Monthly · takes 2 min</div>
+            {BENCHMARK_MARKERS.monthly.map(marker => (
+              <BenchmarkField
+                key={marker.id}
+                marker={marker}
+                value={todayData[marker.id] || ''}
+                lastReading={findLastReading(benchmarks, marker.id, todayISO)}
+                onChange={(v) => onBenchmarkChange(todayISO, marker.id, v)}
+              />
+            ))}
+          </>
+        )}
+        {!isMonthly && (
+          <div style={styles.markerNote}>Monthly markers unlock on the first Sunday of each month.</div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function BenchmarkField({ marker, value, lastReading, onChange }) {
+  return (
+    <div style={styles.markerField}>
+      <label style={styles.markerLabel}>
+        {marker.label}
+        <span style={styles.markerTarget}>target {marker.target} {marker.unit}</span>
+      </label>
+      <div style={styles.markerInputRow}>
+        <input
+          type="number"
+          inputMode="decimal"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="—"
+          min={marker.min}
+          max={marker.max}
+          step={marker.step}
+          style={styles.markerInput}
+        />
+        <span style={styles.markerUnit}>{marker.unit}</span>
+        {lastReading && (
+          <span style={styles.markerLast}>
+            last {lastReading.value} · {parseISODate(lastReading.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
 // RETROSPECTIVE
 // ============================================================
 function RetrospectiveBlock({ block, todayISO, retros, onRetroChange }) {
@@ -605,9 +733,213 @@ function TargetsBox({ targets }) {
 }
 
 // ============================================================
+// TRENDS SECTION (Journey tab)
+// ============================================================
+function collectSeries(source, key) {
+  const out = [];
+  for (const [date, dayData] of Object.entries(source || {})) {
+    const raw = dayData?.[key];
+    if (raw === undefined || raw === null || raw === '') continue;
+    const num = parseFloat(raw);
+    if (isNaN(num)) continue;
+    out.push({ date, value: num });
+  }
+  return out.sort((a, b) => a.date.localeCompare(b.date));
+}
+
+function TrendsSection({ benchmarks, retros, todayISO }) {
+  // Phase transition markers to overlay on charts
+  const phaseMarkers = PHASES
+    .filter(p => p.startDay > 0)
+    .map(p => {
+      const start = parseISODate(PRP_DATE);
+      start.setDate(start.getDate() + p.startDay);
+      return { date: toISODate(start), phaseName: p.name + ' · ' + p.subtitle, color: p.color };
+    });
+
+  // Ankle mobility (paired L/R, higher = better)
+  const kwL = collectSeries(benchmarks, 'kneeToWall_L');
+  const kwR = collectSeries(benchmarks, 'kneeToWall_R');
+
+  // Knee pain (single, from retros, lower = better, target line at 3)
+  const knee = collectSeries(retros, 'knee');
+
+  // Single-leg calf raises (paired L/R, higher = better)
+  const calfL = collectSeries(benchmarks, 'calfRaise_L');
+  const calfR = collectSeries(benchmarks, 'calfRaise_R');
+
+  // SL balance eyes closed (paired L/R, higher = better)
+  const balL = collectSeries(benchmarks, 'balance_L');
+  const balR = collectSeries(benchmarks, 'balance_R');
+
+  const totalReadings = kwL.length + kwR.length + knee.length + calfL.length + calfR.length + balL.length + balR.length;
+
+  return (
+    <div style={styles.trendsSection}>
+      <div style={styles.trendsHeader}>Trends</div>
+      <div style={styles.trendsSubtitle}>
+        {totalReadings === 0
+          ? 'No readings yet. Log your first on Sunday.'
+          : 'Objective markers over time. Phase boundaries shown as dotted lines.'}
+      </div>
+
+      <TrendChart
+        title="Ankle mobility"
+        subtitle="Knee-to-wall · target 10 cm"
+        min={0} max={15} target={10} unit="cm"
+        series={[
+          { label: 'L', color: 'var(--accent)', data: kwL },
+          { label: 'R', color: 'var(--warn)',   data: kwR },
+        ]}
+        phaseMarkers={phaseMarkers}
+        todayISO={todayISO}
+      />
+      <TrendChart
+        title="Knee pain"
+        subtitle="Sunday body-check · stay below 3"
+        min={0} max={10} target={3} unit="/10" targetIsThreshold
+        series={[
+          { label: '', color: 'var(--ink)', data: knee },
+        ]}
+        phaseMarkers={phaseMarkers}
+        todayISO={todayISO}
+      />
+      <TrendChart
+        title="Single-leg calf raise"
+        subtitle="Reps to failure · target 25"
+        min={0} max={30} target={25} unit="reps"
+        series={[
+          { label: 'L', color: 'var(--accent)', data: calfL },
+          { label: 'R', color: 'var(--warn)',   data: calfR },
+        ]}
+        phaseMarkers={phaseMarkers}
+        todayISO={todayISO}
+      />
+      <TrendChart
+        title="Single-leg balance"
+        subtitle="Eyes closed · target 30 sec"
+        min={0} max={60} target={30} unit="sec"
+        series={[
+          { label: 'L', color: 'var(--accent)', data: balL },
+          { label: 'R', color: 'var(--warn)',   data: balR },
+        ]}
+        phaseMarkers={phaseMarkers}
+        todayISO={todayISO}
+      />
+    </div>
+  );
+}
+
+function TrendChart({ title, subtitle, series, target, unit, min, max, phaseMarkers, todayISO, targetIsThreshold }) {
+  const width = 320;
+  const height = 110;
+  const padLeft = 32, padRight = 16, padTop = 12, padBottom = 22;
+  const chartW = width - padLeft - padRight;
+  const chartH = height - padTop - padBottom;
+
+  const allPoints = series.flatMap(s => s.data);
+  if (allPoints.length === 0) {
+    return (
+      <div style={styles.trendCard}>
+        <div style={styles.trendHeader}>
+          <div>
+            <div style={styles.trendTitle}>{title}</div>
+            {subtitle && <div style={styles.trendSubtitle}>{subtitle}</div>}
+          </div>
+        </div>
+        <div style={styles.trendEmpty}>No readings yet.</div>
+      </div>
+    );
+  }
+
+  // X domain: from earliest reading (or PRP_DATE, whichever is later) to today
+  const todayT = parseISODate(todayISO).getTime();
+  const earliest = Math.min(...allPoints.map(p => parseISODate(p.date).getTime()));
+  const xMin = earliest;
+  const xMax = todayT;
+  const xRange = Math.max(xMax - xMin, 86400000); // avoid divide-by-zero, min 1 day
+
+  const yRange = max - min;
+  const x = (dateISO) => padLeft + ((parseISODate(dateISO).getTime() - xMin) / xRange) * chartW;
+  const y = (val) => padTop + (1 - (val - min) / yRange) * chartH;
+
+  // Latest values for header display
+  const latests = series.map(s => ({
+    label: s.label,
+    color: s.color,
+    value: s.data.length ? s.data[s.data.length - 1].value : null,
+  }));
+
+  return (
+    <div style={styles.trendCard}>
+      <div style={styles.trendHeader}>
+        <div>
+          <div style={styles.trendTitle}>{title}</div>
+          {subtitle && <div style={styles.trendSubtitle}>{subtitle}</div>}
+        </div>
+        <div style={styles.trendLatest}>
+          {latests.map((l, i) => l.value !== null && (
+            <div key={i} style={styles.trendLatestItem}>
+              {l.label && <div style={styles.trendLatestLabel}>{l.label}</div>}
+              <div style={{ color: l.color, fontSize: 15 }}>{l.value}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <svg viewBox={`0 0 ${width} ${height}`} style={{ width: '100%', height: 'auto', display: 'block' }} preserveAspectRatio="none">
+        {/* Y-axis grid lines */}
+        {[min, target, max].map((v, i) => (
+          <g key={i}>
+            <line x1={padLeft} y1={y(v)} x2={width - padRight} y2={y(v)}
+              stroke="var(--rule)"
+              strokeDasharray={v === target ? '2,3' : ''}
+              strokeWidth="0.75" />
+            <text x={padLeft - 5} y={y(v) + 3} fontSize="8" textAnchor="end" fill="var(--muted)" fontFamily="DM Sans, sans-serif">
+              {v}
+            </text>
+          </g>
+        ))}
+        {/* Target label */}
+        <text x={width - padRight} y={y(target) - 3} fontSize="7" textAnchor="end"
+          fill={targetIsThreshold ? 'var(--warn)' : 'var(--accent)'} fontFamily="DM Sans, sans-serif" fontWeight="700">
+          {targetIsThreshold ? 'THRESHOLD' : 'TARGET'}
+        </text>
+        {/* Phase boundary markers */}
+        {phaseMarkers && phaseMarkers.map((pm, i) => {
+          const px = x(pm.date);
+          if (px < padLeft || px > width - padRight) return null;
+          return (
+            <line key={i} x1={px} x2={px} y1={padTop} y2={height - padBottom}
+              stroke={pm.color} strokeDasharray="1.5,3" strokeWidth="0.75" opacity="0.5" />
+          );
+        })}
+        {/* Series data */}
+        {series.map((s, si) => (
+          <g key={si}>
+            {s.data.length >= 2 && (
+              <polyline
+                fill="none"
+                stroke={s.color}
+                strokeWidth="1.75"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                points={s.data.map(p => `${x(p.date)},${y(p.value)}`).join(' ')}
+              />
+            )}
+            {s.data.map((p, pi) => (
+              <circle key={pi} cx={x(p.date)} cy={y(p.value)} r="2.5" fill={s.color} />
+            ))}
+          </g>
+        ))}
+      </svg>
+    </div>
+  );
+}
+
+// ============================================================
 // CALENDAR VIEW
 // ============================================================
-function CalendarView({ todayISO, completions, onSelectDate }) {
+function CalendarView({ todayISO, completions, retros, benchmarks, onSelectDate }) {
   const today = parseISODate(todayISO);
   const [viewMonth, setViewMonth] = useState({ year: today.getFullYear(), month: today.getMonth() });
 
@@ -763,6 +1095,8 @@ function CalendarView({ todayISO, completions, onSelectDate }) {
         <LegendDot color="var(--accent)" label="Complete" />
         <LegendDot color="var(--accent-soft)" label="Partial" />
       </div>
+
+      <TrendsSection benchmarks={benchmarks} retros={retros} todayISO={todayISO} />
     </div>
   );
 }
@@ -890,6 +1224,30 @@ const styles = {
   scoreRow: { display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', gap: 4 },
   scoreChip: { padding: '6px 0', fontSize: 12, fontWeight: 600, fontVariantNumeric: 'tabular-nums', background: 'var(--bg)', border: '1px solid var(--rule)', borderRadius: 4, color: 'var(--muted)', transition: 'all 100ms ease' },
   scoreChipActive: { background: 'var(--accent)', color: 'white', borderColor: 'var(--accent)' },
+
+  // Benchmarks
+  markerSectionLabel: { fontFamily: 'Montserrat, sans-serif', fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: 12 },
+  markerField: { marginBottom: 12 },
+  markerLabel: { display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', fontSize: 13, fontWeight: 600, color: 'var(--ink)', marginBottom: 4, lineHeight: 1.3 },
+  markerTarget: { fontSize: 11, color: 'var(--muted)', fontWeight: 500, letterSpacing: '0.02em' },
+  markerInputRow: { display: 'flex', alignItems: 'center', gap: 8 },
+  markerInput: { width: 80, padding: '8px 10px', fontSize: 15, fontWeight: 600, fontVariantNumeric: 'tabular-nums', border: '1px solid var(--rule)', borderRadius: 6, background: 'var(--bg)', color: 'var(--ink)', outline: 'none', fontFamily: 'inherit' },
+  markerUnit: { fontSize: 12, color: 'var(--muted)', fontWeight: 600 },
+  markerLast: { fontSize: 11, color: 'var(--muted)', marginLeft: 'auto', fontStyle: 'italic' },
+  markerNote: { marginTop: 8, fontSize: 12, color: 'var(--muted)', fontStyle: 'italic', padding: '8px 10px', background: 'var(--bg-card)', borderRadius: 6 },
+
+  // Trends (on Journey tab)
+  trendsSection: { marginTop: 32, paddingTop: 24, borderTop: '1px solid var(--rule)' },
+  trendsHeader: { fontFamily: 'Montserrat, sans-serif', fontSize: 20, fontWeight: 700, letterSpacing: '-0.02em', marginBottom: 4 },
+  trendsSubtitle: { fontSize: 13, color: 'var(--muted)', marginBottom: 20 },
+  trendCard: { marginBottom: 16, padding: 14, background: 'var(--bg-card-hi)', border: '1px solid var(--rule)', borderRadius: 10 },
+  trendHeader: { display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 8, gap: 12 },
+  trendTitle: { fontFamily: 'Montserrat, sans-serif', fontSize: 13, fontWeight: 700, letterSpacing: '0.02em', color: 'var(--ink)' },
+  trendSubtitle: { fontSize: 11, color: 'var(--muted)', marginTop: 2 },
+  trendLatest: { display: 'flex', gap: 10, fontSize: 12, fontVariantNumeric: 'tabular-nums', fontWeight: 700 },
+  trendLatestItem: { display: 'flex', flexDirection: 'column', alignItems: 'flex-end' },
+  trendLatestLabel: { fontSize: 9, letterSpacing: '0.1em', color: 'var(--muted)', textTransform: 'uppercase', fontWeight: 600 },
+  trendEmpty: { padding: '12px 4px', fontSize: 12, color: 'var(--muted)', fontStyle: 'italic', textAlign: 'center' },
 
   targetsBox: { marginTop: 24, padding: 18, background: 'var(--bg-card)', border: '1px solid var(--rule)', borderRadius: 10 },
   targetsHeader: { fontFamily: 'Montserrat, sans-serif', fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', color: 'var(--accent)', marginBottom: 10, display: 'flex', alignItems: 'center' },

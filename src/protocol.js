@@ -45,6 +45,24 @@ export const RUN_PAIN_RULES = [
 ];
 
 // ============================================================
+// BENCHMARK MARKERS — measured on Sunday, trended over time
+// Weekly: quick (30 sec). Monthly: longer test (2 min).
+// Knee pain trend comes from the existing Sunday retro `knee` score.
+// ============================================================
+export const BENCHMARK_MARKERS = {
+  weekly: [
+    { id: 'kneeToWall_L', label: 'Knee-to-wall · L',  short: 'K→W L', unit: 'cm', min: 0, max: 15, step: 0.5, target: 10 },
+    { id: 'kneeToWall_R', label: 'Knee-to-wall · R',  short: 'K→W R', unit: 'cm', min: 0, max: 15, step: 0.5, target: 10 },
+  ],
+  monthly: [
+    { id: 'calfRaise_L', label: 'Single-leg calf raise · L',  short: 'Calf L',    unit: 'reps', min: 0, max: 50, step: 1, target: 25 },
+    { id: 'calfRaise_R', label: 'Single-leg calf raise · R',  short: 'Calf R',    unit: 'reps', min: 0, max: 50, step: 1, target: 25 },
+    { id: 'balance_L',   label: 'SL balance eyes closed · L', short: 'Balance L', unit: 'sec',  min: 0, max: 60, step: 1, target: 30 },
+    { id: 'balance_R',   label: 'SL balance eyes closed · R', short: 'Balance R', unit: 'sec',  min: 0, max: 60, step: 1, target: 30 },
+  ],
+};
+
+// ============================================================
 // V2 PROGRAM — weekly schedule (0=Sun, 1=Mon...6=Sat)
 //
 // Each day has:
@@ -600,6 +618,7 @@ export const DAYS = {
         { id: 'ignoring', label: 'What\'s your body telling you that you\'ve been ignoring?', type: 'text' },
         { id: 'adjust',   label: 'One thing to adjust next week',                         type: 'text' },
       ]},
+      { name: 'Benchmarks', duration: 3, isBenchmarks: true, emphasis: 'Objective progress markers · higher = better' },
     ],
     floor: [
       { name: 'Foam roll major muscle groups', detail: '10 min' },
@@ -660,6 +679,11 @@ export function daysBetween(a, b) {
 
 export function dayNumberForDate(iso) {
   return daysBetween(PRP_DATE, iso);
+}
+
+export function isFirstSundayOfMonth(iso) {
+  const d = parseISODate(iso);
+  return d.getDay() === 0 && d.getDate() <= 7;
 }
 
 export function phaseForDay(dayN) {
