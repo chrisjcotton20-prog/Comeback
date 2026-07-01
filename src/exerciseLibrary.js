@@ -520,12 +520,6 @@ export const exerciseLibrary = {
     execution: 'Walk while holding the weight locked out. Keep ribs down, don\'t arch low back. Switch sides.',
   },
 
-  'Pogo hops': {
-    setup: 'Standing, knees soft.',
-    execution: 'Small bouncy hops, staying on the balls of the feet. Quick ground contact, minimal knee bend. 20–30 per set.',
-    source: 'Plyometric prep',
-  },
-
   // ============================================================
   // ACTIVATION & ISOLATION
   // ============================================================
@@ -556,14 +550,80 @@ export const exerciseLibrary = {
 
   'Clamshells': {
     aliases: ['banded clamshells'],
-    setup: 'Side-lying, knees bent, feet together.',
-    execution: 'Open the top knee toward the ceiling without rolling the hips back. Slow return. Add a short band around knees for progression.',
-    cues: 'Don\'t roll the pelvis back to fake range.',
+    setup: 'Side-lying, knees bent 90°, feet together and stacked. Short band around knees just above joint.',
+    execution: 'Open the top knee toward the ceiling against band resistance without rolling the hips back. Pause 1 sec at top. Slow return. 15 reps per side.',
+    cues: 'Pelvis stays perpendicular to the floor throughout. If the hip rolls back, you\'re using the wrong muscles.',
+    faults: 'Rolling the pelvis to fake range. Speeding through the eccentric.',
+    source: 'PT standard for gluteus medius activation',
   },
 
   'Side-lying hip abduction': {
-    setup: 'Side-lying, top leg straight, bottom leg can be bent.',
-    execution: 'Top leg straight, toes pointed slightly down (engages glute med, not hip flexor). Lift toward ceiling, slow return.',
+    setup: 'Side-lying, top leg straight, bottom leg can be bent for stability.',
+    execution: 'Top leg straight, toes pointed slightly down (engages glute med, not hip flexor). Lift toward ceiling to ~45°, slow lower. 12 reps.',
+    cues: 'Toes down = glute med. Toes up = TFL/hip flexor takes over. Keep the toes down.',
+    faults: 'Rolling back to use hip flexor. Swinging the leg.',
+    source: 'PT standard for gluteus medius isolation',
+  },
+
+  'Monster walks': {
+    aliases: ['lateral band walks', 'banded lateral walks'],
+    setup: 'Short band around ankles or just above knees. Athletic stance, knees slightly bent, hips back.',
+    execution: 'Step laterally, maintaining constant band tension (never let feet come closer than shoulder-width). 10 steps in one direction, 10 back. Keep chest up.',
+    cues: 'Toes forward, not out. Stay low — no rising up between steps. Feel the burn in the outside of both hips.',
+    faults: 'Knees caving inward. Torso rocking side to side. Band going slack.',
+    source: 'PT standard for gluteus medius functional strength',
+  },
+
+  'Short foot exercise': {
+    aliases: ['short foot'],
+    setup: 'Barefoot, standing or seated with feet flat on floor, weight evenly distributed across three points (big toe, pinky toe, heel).',
+    execution: 'Without curling the toes, contract the intrinsic foot muscles to draw the ball of the foot toward the heel — creating a small doming of the arch. Hold 5 sec. Release. 6 reps per foot, twice through.',
+    cues: 'The three points of contact don\'t leave the floor. Toes stay long, not curled. The arch actively lifts.',
+    faults: 'Curling toes to fake the arch lift. Rolling to the outside of the foot.',
+    source: 'Janda short foot exercise — foundational intrinsic foot strength',
+  },
+
+  'Banded standing knee raise': {
+    aliases: ['banded march', 'banded standing march'],
+    setup: 'Standing, short band looped around forefoot. Other end anchored low behind you, or held down by opposite foot.',
+    execution: 'Drive the banded knee up toward chest against resistance. Hold 1 sec at top. Slow lower. 10 reps per side.',
+    cues: 'Trunk stays tall. Don\'t lean back to lift the knee higher. Hip flexor at end range is the goal.',
+    source: 'Hip flexor endurance for late-stride recovery in running',
+  },
+
+  '90/90 hip PAIL/RAIL': {
+    aliases: ['90/90 pail rail', 'hip pail rail'],
+    setup: 'Seated on floor in 90/90 position (front leg 90° hip and knee, back leg 90° hip and knee). Chest tall, both knees pressed toward floor.',
+    execution: '(1) Hold the position passively 2 min, breathing deep. (2) PAIL: drive front knee DOWN into the floor as hard as possible (100% effort) for 10 sec — irradiate tension through the whole body. (3) RAIL: reverse — try to LIFT the front knee UP off the floor at 100% effort for 10 sec. (4) Deepen the range and repeat.',
+    cues: 'PAIL builds strength in the lengthened tissue (the back hip); RAIL builds strength in the shortened tissue (the front hip). Both 100% effort, both 10 sec. This is exhausting — that\'s the point.',
+    faults: 'Half-effort contractions. Not holding the passive stretch long enough first. Skipping the RAIL.',
+    source: 'Functional Range Conditioning — end-range strength locks in mobility gains',
+  },
+
+  'Ankle DF PAIL/RAIL': {
+    aliases: ['ankle dorsiflexion pail rail', 'ankle pail rail'],
+    setup: 'Half-kneeling with front foot flat, knee driven forward over toes into deep dorsiflexion. Hold heel down. This is your passive end range.',
+    execution: '(1) Hold position 2 min. (2) PAIL: press ball of foot DOWN into the floor (plantarflexion effort) at 100% for 10 sec — heel stays down, whole leg irradiating. (3) RAIL: reverse — pull toes UP toward shin (dorsiflexion effort) at 100% for 10 sec, driving knee further forward. (4) Repeat once.',
+    cues: 'The heel MUST stay planted throughout — if it lifts during PAIL, you\'ve lost the range. Ramp effort up over 3 sec, hold at 100% for the remaining 7.',
+    faults: 'Heel lifting. Half-hearted effort. Rushing the tempo.',
+    source: 'Functional Range Conditioning — locks in ankle dorsiflexion gains',
+  },
+
+  'Backward walk': {
+    aliases: ['backward walking', 'reverse walk'],
+    setup: 'Open space (hallway, sidewalk, or backyard) at least 20 feet long. Stand upright, arms relaxed.',
+    execution: 'Walk backward at a brisk pace, driving through the ball of the foot on push-off. Each step, feel the quad (especially VMO — inner thigh above knee) engage. 5 min continuous, or 4–5 laps of ~50 ft.',
+    cues: 'No sled required — the knees-over-toes position happens naturally when walking backward. Focus on smooth, steady rhythm — no rocking side to side. Drive through the quad.',
+    faults: 'Rocking laterally. Landing on the heel. Rushing.',
+    source: 'Knees Over Toes / Ben Patrick — sled substitute for VMO activation and knee decompression',
+  },
+
+  'Pogo hops': {
+    setup: 'Standing, knees soft, arms at sides or slight arm swing.',
+    execution: 'Small bouncy hops on the balls of the feet. Quick ground contact, minimal knee bend. Aim for stiff-spring feel, not squat-jump. 20 reps per set, build to 3 sets.',
+    cues: 'Elastic — like the calves are springs. The ground contact should be near-silent. If you\'re landing hard, back off.',
+    faults: 'Landing on heels. Bending too much at the knee. Slow contact time.',
+    source: 'Plyometric prep for return to running / STRIPE-style power work',
   },
 
   'Psoas march': {

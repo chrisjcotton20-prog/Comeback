@@ -15,6 +15,7 @@ import {
   resolveBlockItems,
   fullModeItems,
   floorModeItems,
+  isRunDayForPhase,
 } from './protocol.js';
 import { lookupExercise } from './exerciseLibrary.js';
 
@@ -298,6 +299,7 @@ function ModeToggle({ mode, setMode, fullMin, floorMin }) {
 // FULL SESSION
 // ============================================================
 function FullSession({ day, phaseId, todayISO, doneIds, onToggle, retros, onRetroChange }) {
+  const isRunDay = isRunDayForPhase(day, phaseId);
   return (
     <div style={{ marginTop: 24 }}>
       {day.blocks.map((block, bi) => {
@@ -322,6 +324,7 @@ function FullSession({ day, phaseId, todayISO, doneIds, onToggle, retros, onRetr
             doneIds={doneIds}
             onToggle={onToggle}
             isFlowWave={!!day.isFlow && block.isFlowWave}
+            isRunDay={isRunDay}
           />
         );
       })}
@@ -332,10 +335,13 @@ function FullSession({ day, phaseId, todayISO, doneIds, onToggle, retros, onRetr
 // ============================================================
 // BLOCK SECTION
 // ============================================================
-function BlockSection({ block, blockIndex, phaseId, todayISO, doneIds, onToggle, isFlowWave }) {
-  const items = resolveBlockItems(block, phaseId, todayISO);
+function BlockSection({ block, blockIndex, phaseId, todayISO, doneIds, onToggle, isFlowWave, isRunDay }) {
+  const dayContext = { isRunDay };
+  const items = resolveBlockItems(block, phaseId, todayISO, dayContext);
   if (items.length === 0) return null;
   const isRunBlock = !!block.isRun && block.runProgressionFor && block.runProgressionFor.includes(phaseId);
+  const useRunDayDuration = isRunDay && block.runDayByPhase && block.runDayByPhase[phaseId] && block.runDayDuration;
+  const displayDuration = useRunDayDuration ? block.runDayDuration : block.duration;
 
   return (
     <div style={{ marginBottom: 28 }}>
@@ -344,7 +350,8 @@ function BlockSection({ block, blockIndex, phaseId, todayISO, doneIds, onToggle,
           <span style={{ ...styles.blockName, ...(isRunBlock ? styles.blockNameRun : {}) }}>{block.name}</span>
           <span style={styles.blockMeta}>
             <Clock size={11} strokeWidth={2} style={{ marginRight: 3, verticalAlign: '-1px' }} />
-            {block.duration} min
+            {displayDuration} min
+            {useRunDayDuration && <span style={styles.compressedTag}> · compressed for run day</span>}
           </span>
           {block.phaseGated && !isRunBlock && <span style={styles.blockPhaseTag}>{PHASE_LABELS[phaseId]}</span>}
           {isRunBlock && <span style={styles.blockRunTag}>Run Day</span>}
@@ -374,7 +381,12 @@ function BlockSection({ block, blockIndex, phaseId, todayISO, doneIds, onToggle,
 function RunRules() {
   return (
     <div style={styles.runRules}>
-      <span style={styles.runRulesLabel}>Pain rule:</span> stop if knee &gt; 3/10 · more sore next morning = repeat this week, don&apos;t progress
+      <div style={{ marginBottom: 4 }}>
+        <span style={styles.runRulesLabel}>Pain rule:</span> stop if knee &gt; 3/10 · more sore next morning = repeat this week, don&apos;t progress
+      </div>
+      <div>
+        <span style={styles.runRulesLabel}>Cadence:</span> target baseline +10% · use a metronome app for the first 2 weeks, then wean off
+      </div>
     </div>
   );
 }
@@ -854,6 +866,7 @@ const styles = {
 
   runRules: { marginTop: 8, padding: '8px 12px', background: 'var(--bg-card)', border: '1px solid var(--rule)', borderRadius: 6, fontSize: 12, color: 'var(--muted)', lineHeight: 1.4 },
   runRulesLabel: { fontWeight: 700, color: 'var(--warn)', textTransform: 'uppercase', letterSpacing: '0.06em', fontSize: 11, marginRight: 4 },
+  compressedTag: { color: 'var(--warn)', fontStyle: 'italic', textTransform: 'none', letterSpacing: 'normal', fontWeight: 500 },
 
   itemWrap: { background: 'var(--bg-card-hi)', borderRadius: 8, border: '1px solid var(--rule)', marginBottom: 6, transition: 'all 200ms ease', overflow: 'hidden' },
   itemWrapDone: { background: 'var(--bg-card)', borderColor: 'var(--accent-soft)' },

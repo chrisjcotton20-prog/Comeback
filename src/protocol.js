@@ -69,7 +69,7 @@ export const DAYS = {
     focus: 'Hip Complex + Posterior Chain',
     why: 'Hip hinge = foundation pattern. Without it, lumbar takes hip motion and knee takes squat compression.',
     doses: { A: 'brief', B: 'heavy', C: 'brief' },
-    fullMin: 55, floorMin: 20,
+    fullMin: 60, floorMin: 20,
     blocks: [
       { name: 'Prepare', duration: 10, items: [
         { name: '90/90 breathing', detail: '5 breaths each side' },
@@ -77,12 +77,21 @@ export const DAYS = {
         { name: 'Knee CARs', detail: '5 each direction, each side' },
         { name: 'Ankle CARs', detail: '5 each direction, each side · (A)' },
         { name: 'Tibialis raises', detail: '1×15' },
+        { name: 'Short foot exercise', detail: '2×30 sec/foot · (A)' },
+      ]},
+      { name: 'Activate', duration: 5, emphasis: 'Glute med + hip abductor', items: [
+        { name: 'Banded clamshells', detail: '2×15/side' },
+        { name: 'Side-lying hip abduction', detail: '2×12/side' },
+        { name: 'Monster walks', detail: '2×10 steps each direction' },
       ]},
       { name: 'Open', duration: 15, emphasis: 'Track B', items: [
         { name: '90/90 transitions', detail: '8 reps slow' },
         { name: 'Hip airplane', detail: '3 each side' },
         { name: 'Cossack squat flow', detail: '8 reps unloaded' },
         { name: 'Pigeon w/ active reaches', detail: '5 each side + 60-sec hold' },
+      ]},
+      { name: 'PAILs/RAILs — 90/90 Hip', duration: 5, emphasis: 'End-range strength', showInPhases: ['p3', 'maint'], items: [
+        { name: '90/90 hip PAIL/RAIL', detail: '2 min hold → 10-sec PAIL → 10-sec RAIL, 2 rounds/side' },
       ]},
       { name: 'Load', duration: 20, emphasis: 'Hinge progression', phaseGated: true, byPhase: {
         p2early: [
@@ -142,6 +151,7 @@ export const DAYS = {
         { name: 'Ankle CARs', detail: '5 each direction/side' },
         { name: 'Knee CARs', detail: '5 each direction/side' },
         { name: 'Toe spreads / yoga toes', detail: '60 sec' },
+        { name: 'Short foot exercise', detail: '2×30 sec/foot' },
       ]},
       { name: 'Open', duration: 15, emphasis: 'Track A', items: [
         { name: 'Banded ankle distraction', detail: '10 deep pulses/side × 2' },
@@ -149,39 +159,57 @@ export const DAYS = {
         { name: 'Wall-banded dorsiflexion', detail: '10/side' },
         { name: 'Calf stretch split stance', detail: '60 sec gastroc + 60 sec soleus/side' },
       ]},
+      { name: 'PAILs/RAILs — Ankle DF', duration: 5, emphasis: 'End-range strength', showInPhases: ['p3', 'maint'], items: [
+        { name: 'Ankle DF PAIL/RAIL', detail: '2 min end-range hold → 10-sec PAIL → 10-sec RAIL, 2 rounds/side' },
+      ]},
       { name: 'Run', duration: 25, isRun: true, runProgressionFor: ['p3', 'maint'], emphasis: 'Scheduled run day' },
-      { name: 'Load', duration: 20, emphasis: 'Single-leg strength', phaseGated: true, byPhase: {
-        p2early: [
-          { name: 'Wall-supported single-leg balance', detail: '3×30 sec/side' },
-          { name: 'Double-leg calf raise', detail: '3×15' },
-          { name: 'Tibialis raise', detail: '3×15' },
-          { name: 'Concentric step-up to low box', detail: '3×10/side' },
-        ],
-        p2late: [
-          { name: 'Single-leg balance + head turns', detail: '3×30 sec/side' },
-          { name: 'Single-leg calf raise', detail: '3×12/side' },
-          { name: 'Tibialis raise', detail: '3×20' },
-          { name: 'Step-up controlled down', detail: '3×10/side' },
-          { name: 'Banded TKE single-leg', detail: '3×12/side' },
-        ],
-        p3: [
-          { name: 'KOT slant-board squat', detail: '3×12' },
-          { name: 'ATG split squat (assisted)', detail: '3×8/side' },
-          { name: 'Single-leg calf raise w/ 3-sec eccentric', detail: '3×12/side' },
-          { name: 'Lateral step-down', detail: '3×12/side' },
-        ],
-        maint: [
-          { name: 'Loaded ATG split squat', detail: '3×8/side' },
-          { name: 'Loaded single-leg calf raise', detail: '3×12/side' },
-          { name: 'Tibialis raise w/ band', detail: '3×20' },
-          { name: 'Pistol progression', detail: '3×5/side' },
-        ],
-      }},
+      { name: 'Load', duration: 20, runDayDuration: 10, emphasis: 'Single-leg strength', phaseGated: true,
+        byPhase: {
+          p2early: [
+            { name: 'Wall-supported single-leg balance', detail: '3×30 sec/side' },
+            { name: 'Double-leg calf raise', detail: '3×15' },
+            { name: 'Tibialis raise', detail: '3×15' },
+            { name: 'Concentric step-up to low box', detail: '3×10/side' },
+          ],
+          p2late: [
+            { name: 'Single-leg balance + head turns', detail: '3×30 sec/side' },
+            { name: 'Single-leg calf raise', detail: '3×12/side' },
+            { name: 'Tibialis raise', detail: '3×20' },
+            { name: 'Step-up controlled down', detail: '3×10/side' },
+            { name: 'Banded TKE single-leg', detail: '3×12/side' },
+          ],
+          p3: [
+            { name: 'KOT slant-board squat', detail: '3×12' },
+            { name: 'ATG split squat (assisted)', detail: '3×8/side' },
+            { name: 'Single-leg calf raise w/ 3-sec eccentric', detail: '3×12/side' },
+            { name: 'Lateral step-down', detail: '3×12/side' },
+          ],
+          maint: [
+            { name: 'Loaded ATG split squat', detail: '3×8/side' },
+            { name: 'Loaded single-leg calf raise', detail: '3×12/side' },
+            { name: 'Tibialis raise w/ band', detail: '3×20' },
+            { name: 'Pistol progression', detail: '3×5/side' },
+          ],
+        },
+        runDayByPhase: {
+          p3: [
+            { name: 'KOT slant-board squat', detail: '2×10' },
+            { name: 'Lateral step-down', detail: '2×10/side' },
+            { name: 'Single-leg calf raise w/ 3-sec eccentric', detail: '2×12/side' },
+          ],
+          maint: [
+            { name: 'Loaded ATG split squat', detail: '2×8/side' },
+            { name: 'Loaded single-leg calf raise', detail: '2×12/side' },
+            { name: 'Tibialis raise w/ band', detail: '2×20' },
+          ],
+        },
+      },
       { name: 'Integrate', duration: 5, emphasis: 'Track B', items: [
         { name: '90/90 breathing', detail: '5 breaths each side' },
         { name: 'Couch stretch', detail: '90 sec each side' },
       ]},
-      { name: 'Finisher', duration: 5, optional: true, items: [
+      { name: 'Finisher', duration: 10, optional: true, items: [
+        { name: 'Backward walk', detail: '5 min brisk · drive through VMO · (A/KOT)' },
         { name: 'Peanut t-spine', detail: '2 min · (C)' },
         { name: 'Open books', detail: '5 each side' },
       ]},
@@ -233,6 +261,7 @@ export const DAYS = {
           { name: 'Bird dog row w/ band', detail: '3×8/side' },
           { name: 'Side plank reach-through', detail: '3×8/side' },
           { name: 'Heavier suitcase carry', detail: '3×40 sec/side' },
+          { name: 'Banded standing knee raise', detail: '3×10/side · hip flexor endurance' },
           { name: 'Hollow body hold', detail: '3×20–30 sec' },
         ],
         p3: [
@@ -240,12 +269,14 @@ export const DAYS = {
           { name: 'Bird dog row', detail: '3×10/side' },
           { name: 'Copenhagen plank', detail: '3×15 sec/side' },
           { name: 'Heavy suitcase carry', detail: '3×40 sec/side' },
+          { name: 'Banded standing knee raise', detail: '3×10/side · hip flexor endurance' },
           { name: 'Farmer\'s carry', detail: '3×30 sec' },
         ],
         maint: [
           { name: 'Heavy farmer\'s carry', detail: '3×40 sec' },
           { name: 'Overhead carry', detail: '3×30 sec/side' },
           { name: 'Pallof + rotation', detail: '3×10/side' },
+          { name: 'Weighted standing knee raise', detail: '3×10/side · hip flexor power' },
           { name: 'Dragon flag negatives', detail: '3×5' },
         ],
       }},
@@ -296,36 +327,50 @@ export const DAYS = {
         { name: 'Wall-supported handstand hold', detail: '10–30 sec × 2 · optional' },
       ]},
       { name: 'Run', duration: 25, isRun: true, runProgressionFor: ['p3', 'maint'], emphasis: 'Scheduled run day' },
-      { name: 'Load', duration: 20, emphasis: 'Push/pull balance', phaseGated: true, byPhase: {
-        p2early: [
-          { name: 'Banded row', detail: '3×12' },
-          { name: 'Pushup (knee or full)', detail: '3×8–12' },
-          { name: 'Banded shoulder press', detail: '3×10' },
-          { name: 'Banded face pull', detail: '3×15' },
-          { name: 'Scap pull', detail: '3×10' },
-        ],
-        p2late: [
-          { name: 'Banded pull-apart', detail: '3×15' },
-          { name: 'Pushup w/ shoulder tap', detail: '3×6/side' },
-          { name: 'Banded overhead press', detail: '3×10' },
-          { name: 'Banded W raise', detail: '3×12' },
-          { name: 'Hollow body hold', detail: '3×20 sec' },
-        ],
-        p3: [
-          { name: 'Pull-up (assisted or full)', detail: '3×AMRAP' },
-          { name: 'Decline or archer pushup', detail: '3×8' },
-          { name: 'Banded or KB shoulder press', detail: '3×10' },
-          { name: 'KB row', detail: '3×8/side' },
-          { name: 'Banded int/ext rotation', detail: '3×12' },
-        ],
-        maint: [
-          { name: 'Pull-up', detail: '3×AMRAP' },
-          { name: 'Pike pushup / HSPU progression', detail: '3×6' },
-          { name: 'KB press', detail: '3×8/side' },
-          { name: 'KB row', detail: '3×8/side' },
-          { name: 'Reverse fly', detail: '3×12' },
-        ],
-      }},
+      { name: 'Load', duration: 20, runDayDuration: 10, emphasis: 'Push/pull balance', phaseGated: true,
+        byPhase: {
+          p2early: [
+            { name: 'Banded row', detail: '3×12' },
+            { name: 'Pushup (knee or full)', detail: '3×8–12' },
+            { name: 'Banded shoulder press', detail: '3×10' },
+            { name: 'Banded face pull', detail: '3×15' },
+            { name: 'Scap pull', detail: '3×10' },
+          ],
+          p2late: [
+            { name: 'Banded pull-apart', detail: '3×15' },
+            { name: 'Pushup w/ shoulder tap', detail: '3×6/side' },
+            { name: 'Banded overhead press', detail: '3×10' },
+            { name: 'Banded W raise', detail: '3×12' },
+            { name: 'Hollow body hold', detail: '3×20 sec' },
+          ],
+          p3: [
+            { name: 'Pull-up (assisted or full)', detail: '3×AMRAP' },
+            { name: 'Decline or archer pushup', detail: '3×8' },
+            { name: 'Banded or KB shoulder press', detail: '3×10' },
+            { name: 'KB row', detail: '3×8/side' },
+            { name: 'Banded int/ext rotation', detail: '3×12' },
+          ],
+          maint: [
+            { name: 'Pull-up', detail: '3×AMRAP' },
+            { name: 'Pike pushup / HSPU progression', detail: '3×6' },
+            { name: 'KB press', detail: '3×8/side' },
+            { name: 'KB row', detail: '3×8/side' },
+            { name: 'Reverse fly', detail: '3×12' },
+          ],
+        },
+        runDayByPhase: {
+          p3: [
+            { name: 'Pull-up (assisted or full)', detail: '2×AMRAP' },
+            { name: 'Decline or archer pushup', detail: '2×8' },
+            { name: 'KB row', detail: '2×8/side' },
+          ],
+          maint: [
+            { name: 'Pull-up', detail: '2×AMRAP' },
+            { name: 'KB press', detail: '2×8/side' },
+            { name: 'KB row', detail: '2×8/side' },
+          ],
+        },
+      },
       { name: 'Integrate', duration: 5, emphasis: 'Tracks C + B', items: [
         { name: 'Open book rotations', detail: '5 each side' },
         { name: 'Cat/cow', detail: '60 sec' },
@@ -358,7 +403,7 @@ export const DAYS = {
     focus: 'Lower-Body Compound',
     why: 'Main lower-body strength day. Knee-friendly compound variations (KOT progression). Where running power gets rebuilt.',
     doses: { A: 'moderate', B: 'moderate', C: 'brief' },
-    fullMin: 55, floorMin: 20,
+    fullMin: 60, floorMin: 20,
     blocks: [
       { name: 'Prepare', duration: 10, items: [
         { name: 'Foam roll quads', detail: '2 min' },
@@ -367,6 +412,12 @@ export const DAYS = {
         { name: 'Hip CARs', detail: '2 each direction/side · (B)' },
         { name: 'Knee CARs', detail: '5 each direction' },
         { name: 'Ankle CARs + tibialis raises', detail: '2 min · (A)' },
+        { name: 'Short foot exercise', detail: '2×30 sec/foot · (A)' },
+      ]},
+      { name: 'Activate', duration: 5, emphasis: 'Glute med + hip abductor', items: [
+        { name: 'Banded clamshells', detail: '2×15/side' },
+        { name: 'Side-lying hip abduction', detail: '2×12/side' },
+        { name: 'Monster walks', detail: '2×10 steps each direction' },
       ]},
       { name: 'Open', duration: 10, items: [
         { name: 'Cossack squat flow', detail: '8 reps' },
@@ -411,10 +462,26 @@ export const DAYS = {
         { name: 'Open books', detail: '5 each side' },
         { name: 'Couch stretch', detail: '60 sec each side' },
       ]},
-      { name: 'Finisher', duration: 5, optional: true, items: [
-        { name: 'Dead hang', detail: '30 sec' },
-        { name: 'Tibialis wall hold isometric', detail: '30 sec × 2' },
-      ]},
+      { name: 'Finisher', duration: 5, optional: true, phaseGated: true, byPhase: {
+        p2early: [
+          { name: 'Dead hang', detail: '30 sec' },
+          { name: 'Tibialis wall hold isometric', detail: '30 sec × 2' },
+        ],
+        p2late: [
+          { name: 'Dead hang', detail: '30 sec' },
+          { name: 'Tibialis wall hold isometric', detail: '30 sec × 2' },
+        ],
+        p3: [
+          { name: 'Dead hang', detail: '30 sec' },
+          { name: 'Pogo hops', detail: '2×15 · start light, build to 3×20' },
+          { name: 'Tibialis wall hold isometric', detail: '30 sec × 2' },
+        ],
+        maint: [
+          { name: 'Pogo hops', detail: '3×20' },
+          { name: 'Dead hang', detail: '60 sec' },
+          { name: 'Tibialis wall hold isometric', detail: '30 sec × 2' },
+        ],
+      }},
     ],
     floor: [
       { name: 'Foam roll quads + glutes', detail: '3 min' },
@@ -615,7 +682,19 @@ export function runForDate(iso) {
   return RUN_PROGRESSION.find(r => dayN >= r.startDay && dayN <= r.endDay) || null;
 }
 
-export function resolveBlockItems(block, phaseId, iso) {
+// True if any block in this day is an active run block for the given phase
+export function isRunDayForPhase(day, phaseId) {
+  return day.blocks.some(b =>
+    b.isRun && b.runProgressionFor && b.runProgressionFor.includes(phaseId)
+  );
+}
+
+export function resolveBlockItems(block, phaseId, iso, dayContext = {}) {
+  const { isRunDay: dayIsRun } = dayContext;
+
+  // Block-level phase gating (e.g. PAILs/RAILs mini-blocks show only in Phase III+)
+  if (block.showInPhases && !block.showInPhases.includes(phaseId)) return [];
+
   // Run-progression block: dynamic items pulled from RUN_PROGRESSION by date
   if (block.runProgressionFor && block.runProgressionFor.includes(phaseId)) {
     const run = iso ? runForDate(iso) : null;
@@ -625,6 +704,12 @@ export function resolveBlockItems(block, phaseId, iso) {
       detail: `${run.surface} · ~${run.durMin} min · ${run.label}`,
     }];
   }
+
+  // Run-day compression: swap in the reduced Load prescription on run days
+  if (dayIsRun && block.runDayByPhase && block.runDayByPhase[phaseId]) {
+    return block.runDayByPhase[phaseId];
+  }
+
   if (block.phaseGated && block.byPhase) {
     return block.byPhase[phaseId] || [];
   }
@@ -633,9 +718,10 @@ export function resolveBlockItems(block, phaseId, iso) {
 
 export function fullModeItems(day, phaseId, iso) {
   const items = [];
+  const dayContext = { isRunDay: isRunDayForPhase(day, phaseId) };
   day.blocks.forEach((block, bi) => {
     if (block.isRetrospective) return; // retrospective doesn't count toward checkboxes
-    const blockItems = resolveBlockItems(block, phaseId, iso);
+    const blockItems = resolveBlockItems(block, phaseId, iso, dayContext);
     blockItems.forEach((it, ii) => {
       items.push({ id: `b${bi}_${ii}`, ...it, blockIndex: bi });
     });
